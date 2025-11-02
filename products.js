@@ -1,33 +1,10 @@
-// Dynamic product fetching from real e-commerce sources
-const API_CONFIG = {
-  unsplash: {
-    accessKey: 'client_id=your_unsplash_key', // Public demo mode
-    baseUrl: 'https://api.unsplash.com/search/photos'
-  }
-};
-
 // Product search queries for each category
 const CATEGORY_QUERIES = {
-  shoes: [
-    'nike shoes product', 'adidas sneakers', 'running shoes', 
-    'sports shoes', 'casual sneakers', 'athletic footwear'
-  ],
-  clothes: [
-    'mens shirt fashion', 'jeans denim', 'tshirt apparel',
-    'jacket clothing', 'formal wear', 'casual wear'
-  ],
-  makeup: [
-    'lipstick cosmetics', 'foundation makeup', 'eyeshadow palette',
-    'mascara beauty', 'makeup products', 'cosmetics beauty'
-  ],
-  skincare: [
-    'skincare serum', 'face cream moisturizer', 'cleanser skincare',
-    'sunscreen lotion', 'face wash', 'beauty products'
-  ],
-  electronics: [
-    'wireless earbuds', 'smartwatch wearable', 'bluetooth speaker',
-    'power bank', 'gaming mouse', 'tech gadgets'
-  ]
+  shoes: ['nike+shoes', 'adidas+sneakers', 'running+shoes', 'sports+shoes', 'casual+sneakers'],
+  clothes: ['mens+shirt', 'jeans+denim', 'tshirt', 'jacket', 'formal+wear'],
+  makeup: ['lipstick', 'foundation', 'eyeshadow', 'mascara', 'makeup'],
+  skincare: ['skincare+serum', 'face+cream', 'cleanser', 'sunscreen', 'moisturizer'],
+  electronics: ['wireless+earbuds', 'smartwatch', 'bluetooth+speaker', 'power+bank', 'tech+gadgets']
 };
 
 // Indian e-commerce platforms
@@ -46,33 +23,33 @@ const PRICE_RANGES = {
 const PRODUCT_NAMES = {
   shoes: [
     'Running Shoes', 'Sneakers', 'Sports Shoes', 'Casual Shoes',
-    'Training Shoes', 'Walking Shoes', 'Lifestyle Sneakers'
+    'Training Shoes', 'Walking Shoes', 'Lifestyle Sneakers', 'Athletic Shoes'
   ],
   clothes: [
     'Slim Fit Shirt', 'Regular Fit Jeans', 'Casual T-Shirt',
-    'Formal Shirt', 'Denim Jacket', 'Cotton Kurta', 'Polo T-Shirt'
+    'Formal Shirt', 'Denim Jacket', 'Cotton Kurta', 'Polo T-Shirt', 'Hoodie'
   ],
   makeup: [
     'Matte Lipstick', 'Liquid Foundation', 'Eyeshadow Palette',
-    'Kajal Pencil', 'Compact Powder', 'Lip Gloss', 'Mascara'
+    'Kajal Pencil', 'Compact Powder', 'Lip Gloss', 'Mascara', 'Blush Palette'
   ],
   skincare: [
     'Face Serum', 'Moisturizer', 'Face Wash', 'Sunscreen Lotion',
-    'Night Cream', 'Vitamin C Serum', 'Hydrating Gel'
+    'Night Cream', 'Vitamin C Serum', 'Hydrating Gel', 'Toner'
   ],
   electronics: [
     'Wireless Earbuds', 'Smart Watch', 'Bluetooth Speaker',
-    'Power Bank', 'Wireless Mouse', 'Fitness Tracker', 'Portable Speaker'
+    'Power Bank', 'Wireless Mouse', 'Fitness Tracker', 'Portable Speaker', 'USB Cable'
   ]
 };
 
 // Brand names for authenticity
 const BRANDS = {
-  shoes: ['Nike', 'Adidas', 'Puma', 'Reebok', 'New Balance', 'Skechers', 'Asics'],
-  clothes: ['Levi\'s', 'Allen Solly', 'Van Heusen', 'H&M', 'Zara', 'FabIndia', 'Peter England'],
-  makeup: ['Maybelline', 'Lakme', 'MAC', 'Nykaa', 'Sugar', 'Colorbar', 'L\'Oreal'],
-  skincare: ['Cetaphil', 'Neutrogena', 'The Ordinary', 'Minimalist', 'Plum', 'Mamaearth', 'Biotique'],
-  electronics: ['boAt', 'JBL', 'Sony', 'Mi', 'Fire-Boltt', 'Noise', 'Logitech']
+  shoes: ['Nike', 'Adidas', 'Puma', 'Reebok', 'New Balance', 'Skechers', 'Asics', 'Fila'],
+  clothes: ['Levi\'s', 'Allen Solly', 'Van Heusen', 'H&M', 'Zara', 'FabIndia', 'Peter England', 'Arrow'],
+  makeup: ['Maybelline', 'Lakme', 'MAC', 'Nykaa', 'Sugar', 'Colorbar', 'L\'Oreal', 'Revlon'],
+  skincare: ['Cetaphil', 'Neutrogena', 'The Ordinary', 'Minimalist', 'Plum', 'Mamaearth', 'Biotique', 'Himalaya'],
+  electronics: ['boAt', 'JBL', 'Sony', 'Mi', 'Fire-Boltt', 'Noise', 'Logitech', 'Samsung']
 };
 
 // Generate random price within category range
@@ -130,31 +107,23 @@ function generateDescription(category, productName) {
   return descriptions[category][Math.floor(Math.random() * descriptions[category].length)];
 }
 
-// Fetch product image from Unsplash
-async function fetchProductImage(category) {
-  try {
-    const queries = CATEGORY_QUERIES[category];
-    const randomQuery = queries[Math.floor(Math.random() * queries.length)];
-    
-    // Using Unsplash Source API (no key required)
-    const randomSeed = Math.random().toString(36).substring(7);
-    const imageUrl = `https://source.unsplash.com/400x400/?${encodeURIComponent(randomQuery)}&sig=${randomSeed}`;
-    
-    return imageUrl;
-  } catch (error) {
-    console.error('Error fetching image:', error);
-    // Fallback to category-specific placeholder
-    return `https://via.placeholder.com/400x400/f0f0f0/666666?text=${category}`;
-  }
+// Get product image URL using Unsplash Source (no API key needed)
+function getProductImageUrl(category, index) {
+  const queries = CATEGORY_QUERIES[category];
+  const query = queries[index % queries.length];
+  // Add timestamp to ensure different images each time
+  const timestamp = Date.now();
+  const randomSeed = Math.floor(Math.random() * 10000);
+  return `https://source.unsplash.com/400x400/?${query}&t=${timestamp}&sig=${randomSeed}`;
 }
 
 // Generate a single product
-async function generateProduct(category) {
+function generateProduct(category, index) {
   const name = generateProductName(category);
   const price = generatePrice(category);
   const platform = PLATFORMS[Math.floor(Math.random() * PLATFORMS.length)];
   const description = generateDescription(category, name);
-  const image = await fetchProductImage(category);
+  const image = getProductImageUrl(category, index);
   
   return {
     name,
@@ -165,28 +134,29 @@ async function generateProduct(category) {
   };
 }
 
-// Get random products for a category
-async function getRandomProducts(category, count = 5) {
+// Get random products for a category (synchronous - no async needed)
+function getRandomProducts(category, count = 5) {
   const products = [];
   
-  // Generate products in parallel for faster loading
-  const productPromises = Array(count).fill(null).map(() => generateProduct(category));
-  const generatedProducts = await Promise.all(productPromises);
+  for (let i = 0; i < count; i++) {
+    products.push(generateProduct(category, i));
+  }
   
-  return generatedProducts;
+  return products;
 }
 
-// Preload images to avoid loading delays during game
+// Preload image to check if it loads
 function preloadImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(url);
-    img.onerror = reject;
+    img.onerror = () => {
+      console.warn('Image failed to load:', url);
+      resolve(url); // Resolve anyway to not block the game
+    };
     img.src = url;
+    
+    // Timeout after 5 seconds
+    setTimeout(() => resolve(url), 5000);
   });
-}
-
-// Export for use in script.js
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { getRandomProducts, preloadImage };
 }
