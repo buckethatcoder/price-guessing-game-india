@@ -29,6 +29,7 @@ const roundEl = document.getElementById('round');
 const finalScoreEl = document.getElementById('finalScore');
 const performanceEl = document.getElementById('performance');
 const playAgainBtn = document.getElementById('playAgain');
+const productNameGuessEl = document.getElementById('productNameGuess');
 
 // Event listeners
 categoryButtons.forEach(btn => {
@@ -52,12 +53,14 @@ function showLoading(element, text = 'Loading...') {
   const originalText = element.textContent;
   element.textContent = text;
   element.classList.add('loading');
+  element.disabled = true;
   return originalText;
 }
 
 function hideLoading(element, originalText) {
   element.textContent = originalText;
   element.classList.remove('loading');
+  element.disabled = false;
 }
 
 // Game functions
@@ -73,11 +76,17 @@ async function startGame() {
   const originalText = showLoading(loadingBtn, 'Loading...');
   
   try {
-    // Generate random products for this game session
-    products = await getRandomProducts(currentCategory, totalRounds);
+    // Generate random products for this game session (synchronous now)
+    products = getRandomProducts(currentCategory, totalRounds);
     
-    // Preload all images
-    await Promise.all(products.map(p => preloadImage(p.image)));
+    console.log('Products generated:', products);
+    
+    // Preload first image
+    if (products.length > 0) {
+      await preloadImage(products[0].image);
+    }
+    
+    hideLoading(loadingBtn, originalText);
     
     categoryScreen.classList.remove('active');
     gameScreen.classList.add('active');
@@ -87,9 +96,10 @@ async function startGame() {
     console.error('Error starting game:', error);
     alert('Failed to load products. Please try again.');
     hideLoading(loadingBtn, originalText);
-  } finally {
     isLoading = false;
   }
+  
+  isLoading = false;
 }
 
 function nextRound() {
@@ -101,13 +111,21 @@ function nextRound() {
   currentRound++;
   currentProduct = products[currentRound - 1];
   
+  console.log('Current product:', currentProduct);
+  
   // Update UI
   roundEl.textContent = `${currentRound}/${totalRounds}`;
   scoreEl.textContent = score;
   productImage.src = currentProduct.image;
-  productImage.alt = 'Product image';
+  productImage.alt = currentProduct.name;
   platformBadge.textContent = currentProduct.platform;
+  productNameGuessEl.textContent = currentProduct.name;
   priceInput.value = '';
+  
+  // Preload next image if available
+  if (currentRound < totalRounds) {
+    preloadImage(products[currentRound].image);
+  }
   
   // Show guess section, hide result
   guessSection.style.display = 'flex';
@@ -203,5 +221,5 @@ function resetGame() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  priceInput.focus();
+  console.log('Game initialized');
 });
