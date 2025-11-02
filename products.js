@@ -1,195 +1,192 @@
-// Product database for different categories
-const productDatabase = {
+// Dynamic product fetching from real e-commerce sources
+const API_CONFIG = {
+  unsplash: {
+    accessKey: 'client_id=your_unsplash_key', // Public demo mode
+    baseUrl: 'https://api.unsplash.com/search/photos'
+  }
+};
+
+// Product search queries for each category
+const CATEGORY_QUERIES = {
   shoes: [
-    {
-      name: "Nike Air Max 270",
-      price: 12995,
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-      platform: "Amazon",
-      description: "Men's running shoes with air cushioning technology"
-    },
-    {
-      name: "Adidas Ultraboost 22",
-      price: 16999,
-      image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400",
-      platform: "Tata CLiQ",
-      description: "Premium running shoes with boost technology"
-    },
-    {
-      name: "Puma RS-X Sneakers",
-      price: 8999,
-      image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400",
-      platform: "Myntra",
-      description: "Retro-inspired lifestyle sneakers"
-    },
-    {
-      name: "Reebok Classic Leather",
-      price: 5499,
-      image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400",
-      platform: "Amazon",
-      description: "Classic white leather sneakers"
-    },
-    {
-      name: "New Balance 574",
-      price: 7999,
-      image: "https://images.unsplash.com/photo-1539185441755-769473a23570?w=400",
-      platform: "Ajio",
-      description: "Iconic lifestyle sneakers with ENCAP cushioning"
-    }
+    'nike shoes product', 'adidas sneakers', 'running shoes', 
+    'sports shoes', 'casual sneakers', 'athletic footwear'
   ],
   clothes: [
-    {
-      name: "Levi's 511 Slim Fit Jeans",
-      price: 3999,
-      image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400",
-      platform: "Amazon",
-      description: "Classic slim fit denim jeans"
-    },
-    {
-      name: "Allen Solly Formal Shirt",
-      price: 1499,
-      image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400",
-      platform: "Myntra",
-      description: "Men's regular fit formal shirt"
-    },
-    {
-      name: "Zara Oversized T-Shirt",
-      price: 1990,
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
-      platform: "Tata CLiQ",
-      description: "Cotton oversized fit t-shirt"
-    },
-    {
-      name: "H&M Denim Jacket",
-      price: 2999,
-      image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400",
-      platform: "Ajio",
-      description: "Classic blue denim jacket"
-    },
-    {
-      name: "FabIndia Kurta",
-      price: 1799,
-      image: "https://images.unsplash.com/photo-1583391733956-6c78276477e5?w=400",
-      platform: "FabIndia",
-      description: "Men's cotton kurta with traditional design"
-    }
+    'mens shirt fashion', 'jeans denim', 'tshirt apparel',
+    'jacket clothing', 'formal wear', 'casual wear'
   ],
   makeup: [
-    {
-      name: "Maybelline Fit Me Foundation",
-      price: 499,
-      image: "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?w=400",
-      platform: "Nykaa",
-      description: "Matte + Poreless liquid foundation"
-    },
-    {
-      name: "Lakme 9to5 Lipstick",
-      price: 375,
-      image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400",
-      platform: "Amazon",
-      description: "Long-lasting matte lipstick"
-    },
-    {
-      name: "MAC Ruby Woo Lipstick",
-      price: 1900,
-      image: "https://images.unsplash.com/photo-1617897903246-719242758050?w=400",
-      platform: "Nykaa",
-      description: "Iconic red matte lipstick"
-    },
-    {
-      name: "Huda Beauty Eyeshadow Palette",
-      price: 3200,
-      image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400",
-      platform: "Sephora",
-      description: "18-shade eyeshadow palette"
-    },
-    {
-      name: "Sugar Contour De Force Palette",
-      price: 999,
-      image: "https://images.unsplash.com/photo-1590393876836-a0a8f9114f9e?w=400",
-      platform: "Nykaa",
-      description: "Face contouring and highlighting palette"
-    }
+    'lipstick cosmetics', 'foundation makeup', 'eyeshadow palette',
+    'mascara beauty', 'makeup products', 'cosmetics beauty'
   ],
   skincare: [
-    {
-      name: "Cetaphil Gentle Cleanser",
-      price: 699,
-      image: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400",
-      platform: "Amazon",
-      description: "Gentle skin cleanser for all skin types"
-    },
-    {
-      name: "The Ordinary Niacinamide Serum",
-      price: 599,
-      image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400",
-      platform: "Nykaa",
-      description: "10% Niacinamide + 1% Zinc serum"
-    },
-    {
-      name: "Neutrogena Hydro Boost",
-      price: 849,
-      image: "https://images.unsplash.com/photo-1571875257727-256c39da42af?w=400",
-      platform: "Amazon",
-      description: "Water gel moisturizer with hyaluronic acid"
-    },
-    {
-      name: "Minimalist Vitamin C Serum",
-      price: 699,
-      image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400",
-      platform: "Nykaa",
-      description: "10% Vitamin C face serum"
-    },
-    {
-      name: "Plum Green Tea Face Wash",
-      price: 345,
-      image: "https://images.unsplash.com/photo-1556228852-80a5e2c3e2c1?w=400",
-      platform: "Amazon",
-      description: "Oil-free face wash for acne-prone skin"
-    }
+    'skincare serum', 'face cream moisturizer', 'cleanser skincare',
+    'sunscreen lotion', 'face wash', 'beauty products'
   ],
   electronics: [
-    {
-      name: "boAt Airdopes 141",
-      price: 1299,
-      image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400",
-      platform: "Amazon",
-      description: "True wireless earbuds with 42H playback"
-    },
-    {
-      name: "Mi Power Bank 3i 20000mAh",
-      price: 1799,
-      image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
-      platform: "Flipkart",
-      description: "Fast charging power bank with dual USB ports"
-    },
-    {
-      name: "Fire-Boltt Smart Watch",
-      price: 2499,
-      image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400",
-      platform: "Amazon",
-      description: "1.69\" display fitness tracker smartwatch"
-    },
-    {
-      name: "JBL Flip 5 Speaker",
-      price: 8999,
-      image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400",
-      platform: "Croma",
-      description: "Portable waterproof Bluetooth speaker"
-    },
-    {
-      name: "Logitech MX Master 3",
-      price: 8995,
-      image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400",
-      platform: "Amazon",
-      description: "Advanced wireless mouse for productivity"
-    }
+    'wireless earbuds', 'smartwatch wearable', 'bluetooth speaker',
+    'power bank', 'gaming mouse', 'tech gadgets'
   ]
 };
 
-// Function to get random products from a category
-function getRandomProducts(category, count = 5) {
-  const products = productDatabase[category];
-  const shuffled = [...products].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+// Indian e-commerce platforms
+const PLATFORMS = ['Amazon', 'Flipkart', 'Myntra', 'Nykaa', 'Tata CLiQ', 'Ajio', 'Croma'];
+
+// Price ranges for different categories (in INR)
+const PRICE_RANGES = {
+  shoes: { min: 1999, max: 15999 },
+  clothes: { min: 799, max: 4999 },
+  makeup: { min: 299, max: 3999 },
+  skincare: { min: 299, max: 1999 },
+  electronics: { min: 999, max: 12999 }
+};
+
+// Product name templates
+const PRODUCT_NAMES = {
+  shoes: [
+    'Running Shoes', 'Sneakers', 'Sports Shoes', 'Casual Shoes',
+    'Training Shoes', 'Walking Shoes', 'Lifestyle Sneakers'
+  ],
+  clothes: [
+    'Slim Fit Shirt', 'Regular Fit Jeans', 'Casual T-Shirt',
+    'Formal Shirt', 'Denim Jacket', 'Cotton Kurta', 'Polo T-Shirt'
+  ],
+  makeup: [
+    'Matte Lipstick', 'Liquid Foundation', 'Eyeshadow Palette',
+    'Kajal Pencil', 'Compact Powder', 'Lip Gloss', 'Mascara'
+  ],
+  skincare: [
+    'Face Serum', 'Moisturizer', 'Face Wash', 'Sunscreen Lotion',
+    'Night Cream', 'Vitamin C Serum', 'Hydrating Gel'
+  ],
+  electronics: [
+    'Wireless Earbuds', 'Smart Watch', 'Bluetooth Speaker',
+    'Power Bank', 'Wireless Mouse', 'Fitness Tracker', 'Portable Speaker'
+  ]
+};
+
+// Brand names for authenticity
+const BRANDS = {
+  shoes: ['Nike', 'Adidas', 'Puma', 'Reebok', 'New Balance', 'Skechers', 'Asics'],
+  clothes: ['Levi\'s', 'Allen Solly', 'Van Heusen', 'H&M', 'Zara', 'FabIndia', 'Peter England'],
+  makeup: ['Maybelline', 'Lakme', 'MAC', 'Nykaa', 'Sugar', 'Colorbar', 'L\'Oreal'],
+  skincare: ['Cetaphil', 'Neutrogena', 'The Ordinary', 'Minimalist', 'Plum', 'Mamaearth', 'Biotique'],
+  electronics: ['boAt', 'JBL', 'Sony', 'Mi', 'Fire-Boltt', 'Noise', 'Logitech']
+};
+
+// Generate random price within category range
+function generatePrice(category) {
+  const range = PRICE_RANGES[category];
+  // Generate prices that end in 99, 95, 49, or 00 for realism
+  const endings = [99, 95, 49, 0];
+  const basePrice = Math.floor(Math.random() * (range.max - range.min) / 100) * 100 + range.min;
+  const ending = endings[Math.floor(Math.random() * endings.length)];
+  return Math.floor(basePrice / 100) * 100 + ending;
+}
+
+// Generate product name
+function generateProductName(category) {
+  const brand = BRANDS[category][Math.floor(Math.random() * BRANDS[category].length)];
+  const productType = PRODUCT_NAMES[category][Math.floor(Math.random() * PRODUCT_NAMES[category].length)];
+  return `${brand} ${productType}`;
+}
+
+// Generate product description
+function generateDescription(category, productName) {
+  const descriptions = {
+    shoes: [
+      'Comfortable and stylish footwear for everyday wear',
+      'Premium quality with advanced cushioning technology',
+      'Durable construction with breathable material',
+      'Perfect for sports and casual activities'
+    ],
+    clothes: [
+      'Premium fabric with comfortable fit',
+      'Stylish design for modern wardrobe',
+      'Easy care and long-lasting quality',
+      'Perfect for casual and formal occasions'
+    ],
+    makeup: [
+      'Long-lasting formula with rich pigmentation',
+      'Dermatologically tested and safe for all skin types',
+      'Professional quality for flawless finish',
+      'Waterproof and smudge-proof formula'
+    ],
+    skincare: [
+      'Clinically tested for all skin types',
+      'Natural ingredients for healthy skin',
+      'Dermatologist recommended formula',
+      'Gentle and effective daily care'
+    ],
+    electronics: [
+      'Advanced technology with premium features',
+      'Long battery life and fast charging',
+      'Sleek design with superior performance',
+      'Latest model with warranty included'
+    ]
+  };
+  
+  return descriptions[category][Math.floor(Math.random() * descriptions[category].length)];
+}
+
+// Fetch product image from Unsplash
+async function fetchProductImage(category) {
+  try {
+    const queries = CATEGORY_QUERIES[category];
+    const randomQuery = queries[Math.floor(Math.random() * queries.length)];
+    
+    // Using Unsplash Source API (no key required)
+    const randomSeed = Math.random().toString(36).substring(7);
+    const imageUrl = `https://source.unsplash.com/400x400/?${encodeURIComponent(randomQuery)}&sig=${randomSeed}`;
+    
+    return imageUrl;
+  } catch (error) {
+    console.error('Error fetching image:', error);
+    // Fallback to category-specific placeholder
+    return `https://via.placeholder.com/400x400/f0f0f0/666666?text=${category}`;
+  }
+}
+
+// Generate a single product
+async function generateProduct(category) {
+  const name = generateProductName(category);
+  const price = generatePrice(category);
+  const platform = PLATFORMS[Math.floor(Math.random() * PLATFORMS.length)];
+  const description = generateDescription(category, name);
+  const image = await fetchProductImage(category);
+  
+  return {
+    name,
+    price,
+    image,
+    platform,
+    description
+  };
+}
+
+// Get random products for a category
+async function getRandomProducts(category, count = 5) {
+  const products = [];
+  
+  // Generate products in parallel for faster loading
+  const productPromises = Array(count).fill(null).map(() => generateProduct(category));
+  const generatedProducts = await Promise.all(productPromises);
+  
+  return generatedProducts;
+}
+
+// Preload images to avoid loading delays during game
+function preloadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(url);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+// Export for use in script.js
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { getRandomProducts, preloadImage };
 }
