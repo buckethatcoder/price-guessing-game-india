@@ -134,6 +134,11 @@ header h1 {
   transform: translateY(0);
 }
 
+.category-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .category-btn .emoji {
   font-size: 2rem;
 }
@@ -223,10 +228,17 @@ header h1 {
 
 .guess-section h3 {
   color: var(--color-tone-1);
-  margin-bottom: 24px;
-  font-size: 1.125rem;
+  margin-bottom: 8px;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+.guess-prompt {
+  color: var(--color-tone-2);
+  font-size: 0.875rem;
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 
 .input-group {
