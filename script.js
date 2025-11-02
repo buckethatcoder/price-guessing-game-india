@@ -5,6 +5,7 @@ let totalRounds = 5;
 let score = 0;
 let products = [];
 let currentProduct = null;
+let isLoading = false;
 
 // DOM elements
 const categoryScreen = document.getElementById('categoryScreen');
@@ -31,9 +32,10 @@ const playAgainBtn = document.getElementById('playAgain');
 
 // Event listeners
 categoryButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', async () => {
+    if (isLoading) return;
     currentCategory = btn.dataset.category;
-    startGame();
+    await startGame();
   });
 });
 
@@ -45,16 +47,49 @@ priceInput.addEventListener('keypress', (e) => {
 nextRoundBtn.addEventListener('click', nextRound);
 playAgainBtn.addEventListener('click', resetGame);
 
+// Show loading state
+function showLoading(element, text = 'Loading...') {
+  const originalText = element.textContent;
+  element.textContent = text;
+  element.classList.add('loading');
+  return originalText;
+}
+
+function hideLoading(element, originalText) {
+  element.textContent = originalText;
+  element.classList.remove('loading');
+}
+
 // Game functions
-function startGame() {
+async function startGame() {
+  if (isLoading) return;
+  
+  isLoading = true;
   currentRound = 0;
   score = 0;
-  products = getRandomProducts(currentCategory, totalRounds);
   
-  categoryScreen.classList.remove('active');
-  gameScreen.classList.add('active');
+  // Show loading state
+  const loadingBtn = document.querySelector(`[data-category="${currentCategory}"]`);
+  const originalText = showLoading(loadingBtn, 'Loading...');
   
-  nextRound();
+  try {
+    // Generate random products for this game session
+    products = await getRandomProducts(currentCategory, totalRounds);
+    
+    // Preload all images
+    await Promise.all(products.map(p => preloadImage(p.image)));
+    
+    categoryScreen.classList.remove('active');
+    gameScreen.classList.add('active');
+    
+    nextRound();
+  } catch (error) {
+    console.error('Error starting game:', error);
+    alert('Failed to load products. Please try again.');
+    hideLoading(loadingBtn, originalText);
+  } finally {
+    isLoading = false;
+  }
 }
 
 function nextRound() {
@@ -70,11 +105,12 @@ function nextRound() {
   roundEl.textContent = `${currentRound}/${totalRounds}`;
   scoreEl.textContent = score;
   productImage.src = currentProduct.image;
+  productImage.alt = 'Product image';
   platformBadge.textContent = currentProduct.platform;
   priceInput.value = '';
   
   // Show guess section, hide result
-  guessSection.style.display = 'block';
+  guessSection.style.display = 'flex';
   resultSection.classList.add('hidden');
   priceInput.focus();
 }
@@ -166,4 +202,6 @@ function resetGame() {
 }
 
 // Initialize
-priceInput.focus();
+document.addEventListener('DOMContentLoaded', () => {
+  priceInput.focus();
+});
