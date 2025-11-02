@@ -1,12 +1,3 @@
-// Product search queries for each category
-const CATEGORY_QUERIES = {
-  shoes: ['nike+shoes', 'adidas+sneakers', 'running+shoes', 'sports+shoes', 'casual+sneakers'],
-  clothes: ['mens+shirt', 'jeans+denim', 'tshirt', 'jacket', 'formal+wear'],
-  makeup: ['lipstick', 'foundation', 'eyeshadow', 'mascara', 'makeup'],
-  skincare: ['skincare+serum', 'face+cream', 'cleanser', 'sunscreen', 'moisturizer'],
-  electronics: ['wireless+earbuds', 'smartwatch', 'bluetooth+speaker', 'power+bank', 'tech+gadgets']
-};
-
 // Indian e-commerce platforms
 const PLATFORMS = ['Amazon', 'Flipkart', 'Myntra', 'Nykaa', 'Tata CLiQ', 'Ajio', 'Croma'];
 
@@ -50,6 +41,45 @@ const BRANDS = {
   makeup: ['Maybelline', 'Lakme', 'MAC', 'Nykaa', 'Sugar', 'Colorbar', 'L\'Oreal', 'Revlon'],
   skincare: ['Cetaphil', 'Neutrogena', 'The Ordinary', 'Minimalist', 'Plum', 'Mamaearth', 'Biotique', 'Himalaya'],
   electronics: ['boAt', 'JBL', 'Sony', 'Mi', 'Fire-Boltt', 'Noise', 'Logitech', 'Samsung']
+};
+
+// Curated image IDs from Picsum Photos for each category
+const CATEGORY_IMAGES = {
+  shoes: [
+    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&h=400&fit=crop'
+  ],
+  clothes: [
+    'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=400&fit=crop'
+  ],
+  makeup: [
+    'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1583241800698-c318662d6f75?w=400&h=400&fit=crop'
+  ],
+  skincare: [
+    'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1556228852-80f3f5e9e6c6?w=400&h=400&fit=crop'
+  ],
+  electronics: [
+    'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400&h=400&fit=crop',
+    'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop'
+  ]
 };
 
 // Generate random price within category range
@@ -107,14 +137,14 @@ function generateDescription(category, productName) {
   return descriptions[category][Math.floor(Math.random() * descriptions[category].length)];
 }
 
-// Get product image URL using Unsplash Source (no API key needed)
+// Get product image URL
 function getProductImageUrl(category, index) {
-  const queries = CATEGORY_QUERIES[category];
-  const query = queries[index % queries.length];
-  // Add timestamp to ensure different images each time
-  const timestamp = Date.now();
-  const randomSeed = Math.floor(Math.random() * 10000);
-  return `https://source.unsplash.com/400x400/?${query}&t=${timestamp}&sig=${randomSeed}`;
+  const images = CATEGORY_IMAGES[category];
+  // Use modulo to cycle through available images
+  const imageIndex = index % images.length;
+  // Add cache buster to ensure fresh images
+  const cacheBuster = Date.now() + Math.random();
+  return `${images[imageIndex]}&cache=${cacheBuster}`;
 }
 
 // Generate a single product
@@ -149,14 +179,20 @@ function getRandomProducts(category, count = 5) {
 function preloadImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(url);
-    img.onerror = () => {
-      console.warn('Image failed to load:', url);
+    img.onload = () => {
+      console.log('Image loaded successfully:', url);
+      resolve(url);
+    };
+    img.onerror = (error) => {
+      console.error('Image failed to load:', url, error);
       resolve(url); // Resolve anyway to not block the game
     };
     img.src = url;
     
     // Timeout after 5 seconds
-    setTimeout(() => resolve(url), 5000);
+    setTimeout(() => {
+      console.log('Image load timeout:', url);
+      resolve(url);
+    }, 5000);
   });
 }
